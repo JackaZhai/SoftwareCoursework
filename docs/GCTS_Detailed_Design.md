@@ -502,7 +502,9 @@ classDiagram
 类图展示了聚合之间的关系与关键方法，体现面向对象封装与职责分配。聚合根负责维护自身一致性，外部只能通过聚合根公开的方法修改内部状态。
 
 ### 7.3 关键用例顺序图
-为了说明对象之间的协作，给出“毕业生提交信息并触发审核”的顺序图：
+为了说明对象之间的协作，本节从毕业生信息提交流程、问卷发布流程与数据分析流程三个角度给出顺序图示例。
+
+#### 7.3.1 毕业生提交信息并触发审核
 
 ```mermaid
 sequenceDiagram
@@ -527,7 +529,68 @@ sequenceDiagram
     MQ-->>Counselor: 推送审核任务
 ```
 
-类似地，针对问卷发布与数据分析也分别绘制顺序图，确保实现人员理解跨服务交互时序。
+#### 7.3.2 问卷发布全流程顺序图
+
+```mermaid
+sequenceDiagram
+    participant Admin as 管理员
+    participant AdminUI as 管理端界面
+    participant SurveyAPI as SurveyController
+    participant SurveyApp as SurveyApplicationService
+    participant SurveyDomain as SurveyTaskAgg
+    participant SurveyRepo as SurveyRepository
+    participant TaskSched as 调度器
+    participant NotifySvc as 通知服务
+    participant MQ as MessageQueue
+    participant Graduate as 毕业生
+
+    Admin->>AdminUI: 配置问卷模板与发布计划
+    AdminUI->>SurveyAPI: POST /surveys (payload=配置)
+    SurveyAPI->>SurveyApp: createSurvey(command)
+    SurveyApp->>SurveyRepo: save(template, plan)
+    SurveyApp->>SurveyDomain: 初始化问卷任务
+    SurveyDomain-->>SurveyApp: 返回 SurveyCreated 事件
+    SurveyApp->>TaskSched: registerTrigger(plan.cron)
+    Note over TaskSched: 到达计划触发时间
+    TaskSched->>SurveyApp: executePublish(taskId)
+    SurveyApp->>SurveyRepo: load(taskId)
+    SurveyRepo-->>SurveyApp: 返回问卷任务
+    SurveyApp->>SurveyDomain: task.publish()
+    SurveyDomain-->>SurveyApp: 返回 SurveyPublished 事件
+    SurveyApp->>SurveyRepo: updateStatus(PUBLISHED)
+    SurveyApp->>MQ: publish(SurveyPublished)
+    MQ-->>NotifySvc: 分发问卷发布消息
+    NotifySvc->>Graduate: 发送站内信/邮件/短信
+```
+
+#### 7.3.3 数据分析与指标出具顺序图
+
+```mermaid
+sequenceDiagram
+    participant Scheduler as 调度中心
+    participant AnalyticsJob as AnalyticsService
+    participant ETL as ETLProcessor
+    participant SurveyRepo as SurveyRepository
+    participant ProfileRepo as ProfileRepository
+    participant MetricsAgg as MetricsAggregator
+    participant MetricsRepo as MetricsRepository
+    participant Cache as RedisCache
+    participant ReportSvc as ReportService
+
+    Scheduler->>AnalyticsJob: 触发 nightlyAnalyticsJob()
+    AnalyticsJob->>ETL: startExtraction()
+    ETL->>SurveyRepo: 拉取问卷答卷
+    ETL->>ProfileRepo: 拉取毕业生就业信息
+    SurveyRepo-->>ETL: 返回答卷数据集
+    ProfileRepo-->>ETL: 返回就业数据集
+    ETL->>AnalyticsJob: 提供清洗后的数据表
+    AnalyticsJob->>MetricsAgg: 聚合就业率/薪资/行业指标
+    MetricsAgg-->>AnalyticsJob: 返回计算结果
+    AnalyticsJob->>MetricsRepo: persist(results)
+    AnalyticsJob->>Cache: refresh(metrics)
+    AnalyticsJob->>ReportSvc: notifyMetricsReady(batchId)
+    ReportSvc-->>AnalyticsJob: 确认已接收
+```
 
 ### 7.4 状态机设计
 毕业生档案从创建到归档的状态变化如下：
