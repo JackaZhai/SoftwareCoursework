@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="p-4 bg-white rounded shadow-sm">
+    <h1 class="h4">问卷与调查</h1>
+    <p>管理问卷模板、版本与答卷收集。</p>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <h2 class="h5">创建问卷</h2>
+            <form method="post" action="/surveys/add">
+                <div class="mb-2">
+                    <label class="form-label">标题</label>
+                    <input class="form-control" name="title" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">期次/版本</label>
+                    <input class="form-control" name="edition" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">题目（换行分隔）</label>
+                    <textarea class="form-control" name="questions" rows="4" required></textarea>
+                </div>
+                <button class="btn btn-primary" type="submit">新增问卷</button>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <h2 class="h5">提交答卷</h2>
+            <form method="post" action="/surveys/respond">
+                <div class="mb-2">
+                    <label class="form-label">问卷</label>
+                    <select class="form-select" name="survey_title">
+                        {% for survey in surveys %}
+                            <option value="{{ survey.title }}">{{ survey.title }} ({{ survey.edition }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">姓名</label>
+                    <input class="form-control" name="name" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">就业状态</label>
+                    <input class="form-control" name="status" placeholder="如：Employed" required>
+                </div>
+                <button class="btn btn-secondary" type="submit">提交答卷</button>
+            </form>
+        </div>
+    </div>
+    <hr>
+    <h2 class="h5">问卷列表</h2>
+    <div class="accordion" id="surveyList">
+        {% for survey in surveys %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ loop.index }}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}">
+                        {{ survey.title }} - {{ survey.edition }}（题目 {{ survey.questions|length }} / 回收 {{ survey.responses|length }}）
+                    </button>
+                </h2>
+                <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" data-bs-parent="#surveyList">
+                    <div class="accordion-body">
+                        <strong>题目：</strong>
+                        <ul>{% for q in survey.questions %}<li>{{ q }}</li>{% endfor %}</ul>
+                        <strong>答卷：</strong>
+                        <ul>{% for r in survey.responses %}<li>{{ r.name or r['name'] }} - {{ r.status or r['status'] }}</li>{% endfor %}</ul>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

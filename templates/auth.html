@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="p-4 bg-white rounded shadow-sm">
+    <h1 class="h4">身份与权限</h1>
+    <p>管理用户、角色与多因子认证状态，支持 SSO 接入占位。</p>
+    <form class="row g-2" method="post" action="/auth/add">
+        <div class="col-md-4">
+            <label class="form-label">用户名</label>
+            <input name="username" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">角色</label>
+            <input name="role" class="form-control" required placeholder="如：Administrator">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">开启 MFA</label>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="mfa" id="mfa">
+                <label class="form-check-label" for="mfa">是</label>
+            </div>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-primary w-100" type="submit">新增用户</button>
+        </div>
+    </form>
+    <hr>
+    <h2 class="h5">用户列表</h2>
+    <table class="table table-sm">
+        <thead><tr><th>用户名</th><th>角色</th><th>MFA</th></tr></thead>
+        <tbody>
+        {% for user in users %}
+            <tr><td>{{ user.username }}</td><td>{{ user.role }}</td><td>{{ '已启用' if user.mfa_enabled else '未启用' }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <p class="small text-muted">SSO 集成示例：支持学校统一身份认证（此处为演示占位）。</p>
+</div>
+{% endblock %}

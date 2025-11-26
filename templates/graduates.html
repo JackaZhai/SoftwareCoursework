@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="p-4 bg-white rounded shadow-sm">
+    <h1 class="h4">毕业生信息</h1>
+    <p>管理基础数据、就业信息以及附件占位，支持教务系统同步。</p>
+    <form class="row g-2" method="post" action="/graduates/add">
+        <div class="col-md-3">
+            <label class="form-label">姓名</label>
+            <input class="form-control" name="name" required>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">毕业年份</label>
+            <input class="form-control" name="year" required type="number" min="2000" max="2100">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">就业状态</label>
+            <input class="form-control" name="employment_status" placeholder="就业/升学/待就业" required>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">就业单位</label>
+            <input class="form-control" name="employer" placeholder="如：XX 公司" required>
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+            <button class="btn btn-primary w-100" type="submit">添加</button>
+        </div>
+    </form>
+    <hr>
+    <table class="table table-sm align-middle">
+        <thead><tr><th>姓名</th><th>年份</th><th>状态</th><th>单位</th><th>历史</th><th>附件</th></tr></thead>
+        <tbody>
+        {% for grad in graduates %}
+            <tr>
+                <td>{{ grad.name }}</td>
+                <td>{{ grad.year }}</td>
+                <td>{{ grad.employment_status }}</td>
+                <td>{{ grad.employer }}</td>
+                <td><small>{{ grad.history|join(', ') }}</small></td>
+                <td><small>{{ grad.attachments|join(', ') if grad.attachments else '无' }}</small></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
