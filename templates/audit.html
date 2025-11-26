@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="p-4 bg-white rounded shadow-sm">
+    <h1 class="h4">日志审计与监控</h1>
+    <p>采集操作日志，支持对接 ELK / Prometheus（演示占位）。</p>
+    <ul class="list-group list-group-flush">
+        {% for log in logs|reverse %}
+            <li class="list-group-item">{{ log }}</li>
+        {% else %}
+            <li class="list-group-item">暂无日志</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

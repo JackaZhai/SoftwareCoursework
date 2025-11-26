@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="p-4 bg-white rounded shadow-sm">
+    <h1 class="h4">报表与文档</h1>
+    <p>管理报表模板、生成年度报告、审批归档。</p>
+    <form class="row g-2" method="post" action="/reports/generate">
+        <div class="col-md-3">
+            <label class="form-label">标题</label>
+            <input class="form-control" name="title" required>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">版本</label>
+            <input class="form-control" name="version" value="1.0" required>
+        </div>
+        <div class="col-md-5">
+            <label class="form-label">内容摘要</label>
+            <input class="form-control" name="content" placeholder="就业率 95%，深造 10%..." required>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-primary w-100" type="submit">生成草稿</button>
+        </div>
+    </form>
+    <hr>
+    <h2 class="h5">报表列表</h2>
+    <table class="table table-sm">
+        <thead><tr><th>标题</th><th>版本</th><th>审批状态</th><th>操作</th></tr></thead>
+        <tbody>
+        {% for report in reports %}
+            <tr>
+                <td>{{ report.title }}</td>
+                <td>{{ report.version }}</td>
+                <td>{{ '已审批' if report.approved else '待审批' }}</td>
+                <td>
+                    {% if not report.approved %}
+                    <form method="post" action="/reports/approve" class="d-inline">
+                        <input type="hidden" name="title" value="{{ report.title }}">
+                        <button class="btn btn-sm btn-success" type="submit">审批</button>
+                    </form>
+                    {% else %}
+                        <span class="text-muted">已归档</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

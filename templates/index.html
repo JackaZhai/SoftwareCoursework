@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="p-4 bg-white rounded shadow-sm">
+    <h1 class="h3 mb-3">高校毕业生事业发展跟踪管理系统</h1>
+    <p>概览各子系统的关键数据与快捷入口。</p>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="border rounded p-3 h-100">
+                <h2 class="h5">身份与权限</h2>
+                <p>已登记用户 {{ users|length }} 人。</p>
+                <a class="btn btn-sm btn-primary" href="/auth/">管理用户</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="border rounded p-3 h-100">
+                <h2 class="h5">毕业生信息</h2>
+                <p>已收集 {{ graduates|length }} 名毕业生数据。</p>
+                <a class="btn btn-sm btn-primary" href="/graduates/">查看详情</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="border rounded p-3 h-100">
+                <h2 class="h5">问卷与调查</h2>
+                <p>问卷 {{ surveys|length }} 份。</p>
+                <a class="btn btn-sm btn-primary" href="/surveys/">进入问卷</a>
+            </div>
+        </div>
+    </div>
+    <div class="row g-3 mt-1">
+        <div class="col-md-4">
+            <div class="border rounded p-3 h-100">
+                <h2 class="h5">消息推送</h2>
+                <p>累计推送 {{ notifications|length }} 条。</p>
+                <a class="btn btn-sm btn-primary" href="/notifications/">查看推送</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="border rounded p-3 h-100">
+                <h2 class="h5">日志审计</h2>
+                <p>近期事件 {{ logs|length }} 条。</p>
+                <a class="btn btn-sm btn-primary" href="/audit/">查看日志</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="border rounded p-3 h-100">
+                <h2 class="h5">统计分析与报表</h2>
+                <p>生成数据指标与年度报告。</p>
+                <a class="btn btn-sm btn-primary" href="/analytics/">查看分析</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

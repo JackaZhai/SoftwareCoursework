@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="p-4 bg-white rounded shadow-sm">
+    <h1 class="h4">统计分析</h1>
+    <p>通过 ETL 管道产出的就业数据指标（示例）。</p>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="border rounded p-3">
+                <h2 class="h6">就业分布</h2>
+                <ul>
+                    {% for status, count in metrics.counts.items() %}
+                        <li>{{ status }}：{{ count }} 人，占比 {{ metrics.distribution[status] * 100 }}%</li>
+                    {% endfor %}
+                </ul>
+                <p class="small text-muted">总毕业生：{{ metrics.total_graduates }} 人。</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="border rounded p-3">
+                <h2 class="h6">问卷参与度</h2>
+                <ul>
+                    {% for title, count in survey_participation.items() %}
+                        <li>{{ title }}：{{ count }} 份答卷</li>
+                    {% endfor %}
+                </ul>
+                <p class="small text-muted">分析模型可扩展为收入预测、地区分布等。</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
